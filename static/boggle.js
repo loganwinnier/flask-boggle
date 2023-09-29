@@ -43,4 +43,36 @@ function displayBoard(board) {
   $table.append($tbody);
 }
 
+async function handleGoClick(evt){
+  evt.preventDefault();
+
+  $message.empty();
+
+  const $wordInput = $("#wordInput");
+  const word = $wordInput.value();
+
+  const response = await fetch("/api/score-word",{
+      method: "POST",
+      body: JSON.stringify({ gameId, word }),
+      headers: {
+        "content-type": "application/json",
+      }
+  });
+
+  const { result } = await response.json();
+
+  console.log("result: ", result)
+
+  if(result === "ok"){
+    console.log("Ok triggered")
+    const $newLi = $("<li>").text(word)
+    $playedWords.append($newLi);
+  } else {
+    $message.text(`${result}`)
+  }
+
+}
+
+$("#word-input-btn").on("click", handleGoClick);
+
 start();
