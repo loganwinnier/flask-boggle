@@ -3,8 +3,12 @@ from uuid import uuid4
 
 from boggle import BoggleGame
 
+from flask_debugtoolbar import DebugToolbarExtension
+
+
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "this-is-secret"
+debug = DebugToolbarExtension(app)
 
 # The boggle games created, keyed by game id
 games = {}
@@ -27,3 +31,18 @@ def new_game():
     games[game_id] = game
 
     return {"gameId": f"{game_id}", "board": f"{game.board}"}
+
+
+@app.post("/api/score-word")
+def score_word():
+    """"""
+    response = request.form
+    word = response["word"]
+    game = games[f"{response['gameId']}"]
+
+    if game.check_word_on_board(word):
+        return jsonify({"result": "not-word"})
+    elif game.is_word_in_word_list(word):
+        return jsonify({"result": "not-on-board"})
+    else:
+        return jsonify({"result": "ok"})

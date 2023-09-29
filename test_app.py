@@ -27,16 +27,14 @@ class BoggleAppTestCase(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertIn('<!-- Homepage Template - used in test -->', html)
 
-
     def test_api_new_game(self):
         """Test starting a new game."""
 
         with app.test_client() as client:
             resp = client.post('/api/new-game')
-            json = resp.get_data(as_text=True)
+            json = resp.get_json()
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn('gameId', json)
             self.assertIn('board', json)
-
-
+            self.assertIn(json["gameId"], games)
