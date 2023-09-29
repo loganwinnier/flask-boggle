@@ -32,17 +32,16 @@ class BoggleAppTestCase(TestCase):
 
         with app.test_client() as client:
             resp = client.post('/api/new-game')
-            # TODO: json variable is dict is not json
-            json = resp.get_json()
+            data = resp.get_json()
 
             self.assertEqual(resp.status_code, 200)
-            # TODO: add test to check type of gameId and board
-            self.assertIn('gameId', json)
-            self.assertIn('board', json)
-            self.assertIn(json["gameId"], games)
+            self.assertIsInstance(data['gameId'], str)
+            self.assertIsInstance(data['board'], list)
+            self.assertIsInstance(data['board'][0], list)
+            self.assertIn(data["gameId"], games)
 
     def test_api_score_word_not_word(self):
-        """Test validation of word."""
+        """Test word for not a valid word"""
 
         with app.test_client() as client:
             resp_new_game = client.post('/api/new-game')
@@ -56,13 +55,13 @@ class BoggleAppTestCase(TestCase):
 
             resp = client.post(
                 '/api/score-word',
-                json={'gameId': f'{new_game_data["gameId"]}', 'word': "XGX"})
+                json={'gameId': new_game_data["gameId"], 'word': "XGX"})
 
             self.assertEqual(resp.status_code, 200)
             self.assertEqual({"result": "not-word"}, resp.get_json())
 
     def test_api_score_word_ok(self):
-        """Test validation of word."""
+        """Test for valid word"""
 
         with app.test_client() as client:
             resp_new_game = client.post('/api/new-game')
@@ -76,13 +75,13 @@ class BoggleAppTestCase(TestCase):
 
             resp = client.post(
                 '/api/score-word',
-                json={'gameId': f'{new_game_data["gameId"]}', 'word': "CAT"})
+                json={'gameId': new_game_data["gameId"], 'word': "CAT"})
 
             self.assertEqual(resp.status_code, 200)
             self.assertEqual({"result": "ok"}, resp.get_json())
 
     def test_api_score_word_not_on_board(self):
-        """Test validation of word."""
+        """Test for word not on board"""
 
         with app.test_client() as client:
             resp_new_game = client.post('/api/new-game')
@@ -96,7 +95,7 @@ class BoggleAppTestCase(TestCase):
 
             resp = client.post(
                 '/api/score-word',
-                json={'gameId': f'{new_game_data["gameId"]}', 'word': "DOG"})
+                json={'gameId': new_game_data["gameId"], 'word': "DOG"})
 
             self.assertEqual(resp.status_code, 200)
             self.assertEqual({"result": "not-on-board"}, resp.get_json())

@@ -35,12 +35,12 @@ def new_game():
 
 @app.post("/api/score-word")
 def valid_word():
-    """Takes JSON: {'gameid'} Determine if valid word and return JSON: {"result": result of check} """
-    # TODO: update variable name
-    response = request.json
-    word = response["word"]
-    # add game od variable
-    game = games[response['gameId']]
+    """Takes JSON: {'gameId', 'word'} Determine if valid word and return JSON:
+    {"result": "not-word" or "not-on-board" or "ok" } """
+
+    data = request.json
+    word = data["word"]
+    game = games[data['gameId']]
 
     if not game.is_word_in_word_list(word):
         return jsonify({"result": "not-word"})
