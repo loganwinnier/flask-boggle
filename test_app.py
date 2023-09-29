@@ -46,13 +46,16 @@ class BoggleAppTestCase(TestCase):
             resp_new_game = client.post('/api/new-game')
             new_game_data = resp_new_game.get_json()
 
-        
-            resp = client.post(
-                '/api/score-word',
-                json={'gameId': f'{new_game_data["gameId"]}', 'word':'CAT'})
-            json = resp.get_json()
+            games[f"{new_game_data['gameId']}"].board = ["C", "A", "T"], [
+                "O", "X", "X"], ["X", "G", "X"]
 
-            self.assertEqual(resp.status_code, 200)
-            self.assertEqual({"result": "not-word"}, json)
-            # self.assertEqual({"result": "not-on-board"}, json)
-            # self.assertEqual({"result": "ok"}, json)
+            def _test_word(word):
+                resp = client.post(
+                    '/api/score-word',
+                    json={'gameId': f'{new_game_data["gameId"]}', 'word': word})
+                self.assertEqual(resp.status_code, 200)
+                return resp.get_json()
+
+            self.assertEqual({"result": "not-word"}, _test_word("XGX"))
+            self.assertEqual({"result": "not-on-board"}, _test_word("DOG"))
+            self.assertEqual({"result": "ok"}, _test_word("CAT"))
