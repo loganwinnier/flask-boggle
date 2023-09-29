@@ -30,15 +30,17 @@ def new_game():
     game = BoggleGame()
     games[game_id] = game
 
-    return {"gameId": f"{game_id}", "board": f"{game.board}"}
+    return jsonify({"gameId": game_id, "board": game.board})
 
 
 @app.post("/api/score-word")
 def valid_word():
-    """Determine if valid word and return JSON: {"result": result of check} """
+    """Takes JSON: {'gameid'} Determine if valid word and return JSON: {"result": result of check} """
+    # TODO: update variable name
     response = request.json
     word = response["word"]
-    game = games[f"{response['gameId']}"]
+    # add game od variable
+    game = games[response['gameId']]
 
     if not game.is_word_in_word_list(word):
         return jsonify({"result": "not-word"})
